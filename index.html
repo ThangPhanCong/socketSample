@@ -1,0 +1,108 @@
+<!doctype html>
+<html>
+<head>
+	<title>Socket.IO chat</title>
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body {
+			font: 13px Helvetica, Arial;
+		}
+
+		form {
+			background: #000;
+			padding: 3px;
+			position: fixed;
+			bottom: 0;
+			width: 100%;
+		}
+
+		form input {
+			border: 0;
+			padding: 10px;
+			width: 90%;
+			margin-right: .5%;
+		}
+
+		form button {
+			width: 9%;
+			background: rgb(130, 224, 255);
+			border: none;
+			padding: 10px;
+		}
+
+		#messages {
+			list-style-type: none;
+			margin: 0;
+			padding: 0;
+		}
+
+		#messages li {
+			padding: 5px 10px;
+		}
+
+		#messages li:nth-child(odd) {
+			background: #eee;
+		}
+
+		#profileUser {
+			margin-left: 10px;
+			position: fixed;
+			bottom: 60px;
+		}
+	</style>
+</head>
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+<script>
+  $(() => {
+    var socket = io();
+    $('#formMessage').hide();
+    $('#formUser form').submit(() => {
+      const paramUser = {name: $('#newUser').val(), id: Date.now()};
+
+      socket.emit('new user', paramUser);
+      $('#formUser').hide();
+      $('#formMessage').show();
+    });
+
+    $('form').submit(() => {
+      socket.emit('chat message', {message: $('#m').val()});
+      $('#m').val('');
+      return false;
+    });
+
+    socket.on('receive message', (msg) => {
+      $('#messages').append('<li>' + msg.userName + ':'  + msg.message + "</li>");
+    });
+
+  })
+</script>
+<body>
+<ul id="messages"></ul>
+
+<div id="formUser">
+	<form action="">
+		<input id="newUser" autocomplete="off"/>
+		<button>Create Name</button>
+	</form>
+</div>
+
+<div id="profileUser">
+	<div id="nameUser"></div>
+	<img src="https://baodautu.vn/files/2014/10/29/son-tung-m-tp-phai-den-bu-vi-huy-so-len-den-1-ty-dong-24853-1.jpg"
+			 width="50" height="50" alt="Italian Trulli">
+</div>
+<div id="formMessage">
+	<form action="">
+		<input id="m" autocomplete="off"/>
+		<button>Send</button>
+	</form>
+</div>
+
+</body>
+</html>
